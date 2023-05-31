@@ -100,6 +100,14 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+router.get("/:username/applications", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const applications = await User.getJobApplications(req.params.username);
+    return res.json({ applications });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** PATCH /[username] { user } => { user }
  *

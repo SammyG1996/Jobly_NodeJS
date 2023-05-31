@@ -126,26 +126,36 @@ class User {
    **/
 
   static async get(username) {
-    const userRes = await db.query(
-      `SELECT to_json(res)from(
-        SELECT u.username, 
-               u.first_name AS "firstName", 
-               u.last_name AS "lastName", 
-               u.email, 
-               u.is_admin AS "isAdmin", 
-               to_json(a) "applications"
-               FROM users u
-               INNER JOIN applications a
-               ON u.username = a.username
-               WHERE u.username = $1 
-      ) res;`, [username]);
+    // const userRes = await db.query(
+    //   `SELECT to_json(res)from(
+    //     SELECT u.username, 
+    //            u.first_name AS "firstName", 
+    //            u.last_name AS "lastName", 
+    //            u.email, 
+    //            u.is_admin AS "isAdmin", 
+    //            to_json(a) "applications"
+    //            FROM users u
+    //            LEFT OUTER JOIN applications a
+    //            ON u.username = a.username
+               
+    //   ) res;`, []);
 
+    const userRes = await db.query(
+      `SELECT username,
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email,
+              is_admin AS "isAdmin"
+       FROM users
+       WHERE username = $1`,
+    [username]
+);
     const user = userRes.rows[0];
 
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
-    return user.to_json
+    return user
 
   }
 
@@ -230,8 +240,8 @@ class User {
     const duplicateCheck = await db.query(
         `SELECT username
         FROM applications
-        WHERE job_id = $1`,
-      [jobId],
+        WHERE job_id = $1 AND username = $2`,
+      [jobId, username],
     );
 
     if (duplicateCheck.rows[0]) {
@@ -253,6 +263,27 @@ class User {
     const jobApplication = {applied :result.rows[0].jobId};
 
     return jobApplication;
+  }
+
+
+
+
+  static async getJobApplications(username){
+
+    const result = await db.query(
+        `SELECT job_id
+        FROM applications
+        WHERE username = $1`,
+      [username],
+    );
+
+    console.log(result)
+
+    const jobs = result.rows
+
+    if(!jobs) throw new NotFoundError(`No job applications for: ${username}`);
+
+    return jobs
   }
 
 }
