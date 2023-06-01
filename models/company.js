@@ -54,7 +54,6 @@ class Company {
 
   static async findAll(name, minEmployees, maxEmployees) {
     const {sqlStatments, sanatizedStatments} = await this.createFilterSql(name, minEmployees, maxEmployees);
-
     const companiesRes = await db.query(
           `SELECT handle,
                   name,

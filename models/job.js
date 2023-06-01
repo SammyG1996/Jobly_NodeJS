@@ -53,6 +53,7 @@ class Job {
    * */
 
     static async findAll(title, minSalary, hasEquity) {
+      
         const {sqlStatments, sanatizedStatments} = await this.createFilterSql(title, minSalary, hasEquity);
         const jobsRes = await db.query(
               `SELECT id,
