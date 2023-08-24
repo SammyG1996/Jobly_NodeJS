@@ -41,10 +41,8 @@ function authenticateJWT(req, res, next) {
  */
 
 function ensureLoggedIn(req, res, next) {
-  console.log('res', res.locals.user)
   try {
     if (!res.locals.user || !res.locals.user.isAdmin){
-      console.log(req.params)
       if(res.locals.user && req.params && res.locals.user.username === req.params.username){
         return next()
       }
